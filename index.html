@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Photo Gallery</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: #f4f4f9;
+      color: #333;
+      padding: 2rem;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    /* Responsive Grid Layout */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .gallery-item {
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .gallery-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .gallery-item figcaption {
+      padding: 0.9rem;
+      text-align: center;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #444;
+    }
+
+    /* Lightbox Modal Styles */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.9);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      padding: 1rem;
+    }
+
+    .lightbox.active {
+      display: flex;
+    }
+
+    .lightbox-content {
+      position: relative;
+      max-width: 85%;
+      max-height: 80vh;
+      text-align: center;
+    }
+
+    .lightbox-img {
+      max-width: 100%;
+      max-height: 75vh;
+      border-radius: 6px;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+    }
+
+    .lightbox-caption {
+      color: #fff;
+      margin-top: 1rem;
+      font-size: 1.1rem;
+    }
+
+    /* Navigation & Close Buttons */
+    .close-btn, .prev-btn, .next-btn {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      border: none;
+      font-size: 2rem;
+      cursor: pointer;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      transition: background 0.2s;
+      user-select: none;
+    }
+
+    .close-btn:hover, .prev-btn:hover, .next-btn:hover {
+      background: rgba(255, 255, 255, 0.35);
+    }
+
+    .close-btn {
+      top: 20px;
+      right: 25px;
+    }
+
+    .prev-btn {
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .next-btn {
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Photo Gallery</h1>
+
+  <!-- Gallery Grid -->
+  <div class="gallery">
+    <figure class="gallery-item">
+      <img src="https://images.pexels.com/photos/18359798/pexels-photo-18359798.jpeg?cs=srgb&dl=pexels-soubhagya23-18359798.jpg&fm=jpg&_gl=1*1fqzx0i*_ga*MjAzMzE2MzM2Ni4xNzg5NTA0OTU1*_ga_8JE65Q40S6*czE3OTU3MTQyMDckbzIkZzEkdDE3OTU3MTQyMTQkajUzJGwwJGgw" alt="Mountain valley view">
+      <figcaption>Misty Mountain Valley</figcaption>
+    </figure>
+
+    <figure class="gallery-item">
+      <img src="https://images.pexels.com/photos/39837958/pexels-photo-39837958.jpeg?cs=srgb&dl=pexels-jyjyjyjy-39837958.jpg&fm=jpg&_gl=1*sz4fez*_ga*MjAzMzE2MzM2Ni4xNzg5NTA0OTU1*_ga_8JE65Q40S6*czE3OTU3MTQyMDckbzIkZzEkdDE3OTU3MTQzMjQkajckbDAkaDA." alt="River canyon">
+      <figcaption>Emerald River Canyon</figcaption>
+    </figure>
+
+    <figure class="gallery-item">
+      <img src="https://images.pexels.com/photos/1878304/pexels-photo-1878304.jpeg?cs=srgb&dl=pexels-connor-danylenko-534256-1878304.jpg&fm=jpg&_gl=1*qxe9st*_ga*MjAzMzE2MzM2Ni4xNzg5NTA0OTU1*_ga_8JE65Q40S6*czE3OTU3MTQyMDckbzIkZzEkdDE3OTU3MTQzOTUkajU4JGwwJGgw" alt="Ocean waves at dusk">
+      <figcaption>Twilight Over the Ocean</figcaption>
+    </figure>
+
+    <figure class="gallery-item">
+      <img src="https://images.pexels.com/photos/23511043/pexels-photo-23511043.jpeg?cs=srgb&dl=pexels-tomas-malik-793526-23511043.jpg&fm=jpg&_gl=1*djstx*_ga*MjAzMzE2MzM2Ni4xNzg5NTA0OTU1*_ga_8JE65Q40S6*czE3OTU3MTQyMDckbzIkZzEkdDE3OTU3MTQ0NDIkajExJGwwJGgw" alt="Waterfall in lush forest">
+      <figcaption>Hidden Forest Waterfall</figcaption>
+    </figure>
+  </div>
+
+  <!-- Lightbox Modal -->
+  <div class="lightbox" id="lightbox">
+    <button class="close-btn" id="closeBtn" aria-label="Close">&times;</button>
+    <button class="prev-btn" id="prevBtn" aria-label="Previous">&#10094;</button>
+
+    <div class="lightbox-content">
+      <img class="lightbox-img" id="lightboxImg" src="" alt="">
+      <p class="lightbox-caption" id="lightboxCaption"></p>
+    </div>
+
+    <button class="next-btn" id="nextBtn" aria-label="Next">&#10095;</button>
+  </div>
+
+  <script>
+    const items = document.querySelectorAll('.gallery-item');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxCaption = document.getElementById('lightboxCaption');
+    const closeBtn = document.getElementById('closeBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    let currentIndex = 0;
+
+    // Open lightbox with selected image and caption
+    function showImage(index) {
+      if (index < 0) index = items.length - 1;
+      if (index >= items.length) index = 0;
+      currentIndex = index;
+
+      const img = items[currentIndex].querySelector('img');
+      const caption = items[currentIndex].querySelector('figcaption').textContent;
+
+      lightboxImg.src = img.src;
+      lightboxImg.alt = img.alt;
+      lightboxCaption.textContent = caption;
+      lightbox.classList.add('active');
+    }
+
+    // Add click event to every gallery card
+    items.forEach((item, index) => {
+      item.addEventListener('click', () => showImage(index));
+    });
+
+    // Previous, Next, and Close controls
+    prevBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showImage(currentIndex - 1);
+    });
+
+    nextBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showImage(currentIndex + 1);
+    });
+
+    closeBtn.addEventListener('click', () => {
+      lightbox.classList.remove('active');
+    });
+
+    // Close when clicking outside the image
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) {
+        lightbox.classList.remove('active');
+      }
+    });
+
+    // Keyboard navigation (Left, Right, Escape)
+    document.addEventListener('keydown', (e) => {
+      if (!lightbox.classList.contains('active')) return;
+      if (e.key === 'ArrowLeft') showImage(currentIndex - 1);
+      if (e.key === 'ArrowRight') showImage(currentIndex + 1);
+      if (e.key === 'Escape') lightbox.classList.remove('active');
+    });
+  </script>
+
+</body>
+</html>
